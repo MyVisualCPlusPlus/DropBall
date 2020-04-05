@@ -1,0 +1,5 @@
+﻿  DropBallDlg.cpp
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\DropBallDlg.cpp(64,12): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\DropBallDlg.cpp(165,23): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\DropBallDlg.cpp(166,23): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+  DropBall.vcxproj -> E:\UserData\Personal\GitHub\VS\DropBall\Debug\DropBall.exe
