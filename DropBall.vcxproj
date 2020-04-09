@@ -207,7 +207,9 @@
     <None Include="res\DropBall.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\ball.ico" />
     <Image Include="res\DropBall.ico" />
+    <Image Include="res\icon1.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

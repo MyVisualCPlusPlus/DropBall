@@ -15,13 +15,12 @@
 
 // CDropBallDlg 对话框
 
-const int borderSize = 50;
-const int ballMax = 15;
+const int borderSize = 50; // 外边框的大小
 
 CDropBallDlg::CDropBallDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DROPBALL_DIALOG, pParent)
 {
-	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	m_hIcon = AfxGetApp()->LoadIcon(IDR_ICON_BALL);
 }
 
 void CDropBallDlg::DoDataExchange(CDataExchange* pDX)
@@ -65,8 +64,16 @@ BOOL CDropBallDlg::OnInitDialog()
 	// 隐藏鼠标
 	ShowCursor(FALSE);
 	// 定时刷新
-	SetTimer(1, 25, NULL);
+	SetTimer(1, 40, NULL);
 	srand(time(0)); // 初始化随机数种子
+	CString path;
+	GetModuleFileNameW(NULL,path.GetBufferSetLength(MAX_PATH + 1), MAX_PATH);
+	path.ReleaseBuffer();
+	int pos = path.ReverseFind('\\');
+	path = path.Left(pos);
+	CString strFile = path + "\\config.ini";
+	m_ballMax = GetPrivateProfileIntW(_T("ball"), _T("ball_max"), 30, strFile.GetBuffer());
+	strFile.ReleaseBuffer();
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -157,28 +164,88 @@ void CDropBallDlg::DrawBalls(CPaintDC& dc)
 	GetWindowRect(&rcWindow);
 	
 	int speed = 5;
-	if (m_listBall.GetSize() < ballMax)
+	if (m_listBall.GetSize() < m_ballMax)
 	{
-		int centerX = (rcWindow.right - rcWindow.left) / 2;
+		int centerX = (rcWindow.right - rcWindow.left) / 2; 
 		int centerY = (rcWindow.bottom - rcWindow.top) / 2;
 		// 创建实心圆
-		int radius = 20;
-		double deg = 360 / (m_listBall.GetCount() + 1);
+		int flagVal = rand() % 2 == 0 ? 1 : -1;
+		int radius = 20 * 30 / m_ballMax + rand() % 5 * flagVal;
+		double PI = 3.1415926;
+		double radian = (360 / m_ballMax * (m_listBall.GetCount() + 1)) * PI / 180;
 		_stBall stBall;
+		stBall._id = m_listBall.GetSize() + 1;
 		stBall._radius = radius;
-		
-		stBall._x = centerX + radius * sin(deg) * radius;
-		stBall._y = centerY + radius * cos(deg)* radius;
-		stBall._speedX = rand() % 2 == 0 ? speed: -speed;
-		stBall._speedY = rand() % 2 == 0 ? speed: -speed;
+		stBall._x = centerX + 400 * cos(radian);
+		stBall._y = centerY + 400 * sin(radian);
+		stBall._speedX = speed * flagVal;
+		stBall._speedY = speed * flagVal;
 		stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
 		m_listBall.AddTail(stBall);
 	}
+	// 球与墙体碰撞
 	POSITION pos = m_listBall.GetHeadPosition();
 	while (pos != NULL)
 	{
 		_stBall& stBall = m_listBall.GetNext(pos); // 返回引用，方便修改数据
-		// 碰撞判断
+		
+		// 球之间相互碰撞,取各球的相反方向
+		for (auto pos_collision = m_listBall.GetHeadPosition(); pos_collision != NULL;)
+		{
+			_stBall& stColBall = m_listBall.GetNext(pos_collision);
+			if (stColBall._id != stBall._id) // 判断与其它球体碰撞
+			{
+				if (abs(stColBall._x - stBall._x) <= stColBall._radius + stBall._radius && abs(stColBall._y - stBall._y) <= stColBall._radius + stBall._radius) // 中心距离小于半径之和
+				{
+					int nFlagX = stBall._speedX > 0 ? 1 : -1;
+					int nFlagY = stBall._speedY > 0 ? 1 : -1;
+					int nColFlagX = stColBall._speedX > 0 ? 1 : -1;
+					int nColFlagY = stColBall._speedY > 0 ? 1 : -1;
+					// x方向速度设定
+					if (nFlagX > 0 && nColFlagX > 0) // 同向增加
+					{
+						if (stBall._x < stColBall._x)
+							stBall._speedX = -stBall._speedX;
+						else
+							stColBall._speedX = -stColBall._speedX;
+					}
+					else if (nFlagX < 0 && nColFlagX < 0) // 同向减小
+					{
+						if (stBall._x > stColBall._x)
+							stBall._speedX = -stBall._speedX;
+						else
+							stColBall._speedX = -stColBall._speedX;
+					}
+					else { // 异向
+						stBall._speedX = -stBall._speedX;
+						stColBall._speedX = -stColBall._speedX;
+					}
+					// y方向速度设定
+					if (nFlagY > 0 && nColFlagY > 0) // 同向增加
+					{
+						if (stBall._y < stColBall._y)
+							stBall._speedY = -stBall._speedY;
+						else
+							stColBall._speedY = -stColBall._speedY;
+					}
+					else if (nFlagY < 0 && nColFlagY < 0) // 同向减小
+					{
+						if (stBall._y > stColBall._y)
+							stBall._speedY = -stBall._speedY;
+						else
+							stColBall._speedY = -stColBall._speedY;
+					}
+					else { // 异向
+						stBall._speedY = -stBall._speedY;
+						stColBall._speedY = -stColBall._speedY;
+					}
+
+					stColBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
+					stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
+				}
+			}
+		}
+		// 球与墙壁碰撞判断
 		if (stBall._x - stBall._radius <= rcWindow.left + borderSize)
 		{
 			stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
@@ -192,7 +259,7 @@ void CDropBallDlg::DrawBalls(CPaintDC& dc)
 		else if (stBall._y - stBall._radius <= rcWindow.top + borderSize)
 		{
 			stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
-			stBall._speedY = speed ;
+			stBall._speedY = speed;
 		}
 		else if (stBall._y + stBall._radius >= rcWindow.bottom - borderSize)
 		{

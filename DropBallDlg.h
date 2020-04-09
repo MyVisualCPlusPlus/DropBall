@@ -11,6 +11,7 @@ class CDropBallDlg : public CDialogEx
 private:
 	struct _stBall
 	{
+		int _id; // 球体ID
 		int _radius; // 半径
 		int _x; // 左上角X逻辑坐标
 		int _y; // 在上角Y逻辑坐标
@@ -50,6 +51,7 @@ private:
 	RECT m_rcBorderTop;
 	RECT m_rcBorderBottom;
 	CList<_stBall> m_listBall;
+	int m_ballMax; // 球数量上限
 
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);

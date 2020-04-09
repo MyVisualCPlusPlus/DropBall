@@ -1,0 +1,2 @@
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\Debug\DropBall.exe
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\Debug\DropBall.pdb
