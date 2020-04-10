@@ -1,6 +1,11 @@
-﻿  正在生成代码
-  2 of 307 functions ( 0.7%) were compiled, the rest were copied from previous compilation.
+﻿  DropBall.cpp
+  DropBallDlg.cpp
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\DropBallDlg.cpp(66,12): warning C4244: “参数”: 从“time_t”转换到“unsigned int”，可能丢失数据
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\DropBallDlg.cpp(181,23): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+E:\UserData\Personal\GitHub\VS\DropBall\DropBall\DropBallDlg.cpp(182,23): warning C4244: “=”: 从“double”转换到“int”，可能丢失数据
+  正在生成代码
+  7 of 307 functions ( 2.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+    1 functions had inline decision re-evaluated but remain unchanged
   已完成代码的生成
   DropBall.vcxproj -> E:\UserData\Personal\GitHub\VS\DropBall\DropBall\Release\DropBall.exe

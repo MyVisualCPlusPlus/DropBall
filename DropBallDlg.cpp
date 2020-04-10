@@ -15,8 +15,6 @@
 
 // CDropBallDlg 对话框
 
-const int borderSize = 50; // 外边框的大小
-
 CDropBallDlg::CDropBallDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DROPBALL_DIALOG, pParent)
 {
@@ -74,6 +72,11 @@ BOOL CDropBallDlg::OnInitDialog()
 	CString strFile = path + "\\config.ini";
 	m_ballMax = GetPrivateProfileIntW(_T("ball"), _T("ball_max"), 30, strFile.GetBuffer());
 	strFile.ReleaseBuffer();
+	m_speed = GetPrivateProfileIntW(_T("ball"), _T("speed"), 5, strFile.GetBuffer());
+	strFile.ReleaseBuffer();
+	m_borderSize = GetPrivateProfileIntW(_T("border"), _T("size"), 30, strFile.GetBuffer());
+	strFile.ReleaseBuffer();
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -134,26 +137,26 @@ void CDropBallDlg::DrawBorder(CPaintDC& dc)
 	// 绘制左边
 	m_rcBorderLeft.left = rcWindow.left;
 	m_rcBorderLeft.top = rcWindow.top;
-	m_rcBorderLeft.right = m_rcBorderLeft.left + borderSize;
+	m_rcBorderLeft.right = m_rcBorderLeft.left + m_borderSize;
 	m_rcBorderLeft.bottom = rcWindow.bottom ;
 
 	dc.FillSolidRect(&m_rcBorderLeft, RGB(randColorR, randColorG, randColorB));
 	// 绘制右边
-	m_rcBorderRight.left = rcWindow.right - borderSize;
+	m_rcBorderRight.left = rcWindow.right - m_borderSize;
 	m_rcBorderRight.top = rcWindow.top;
 	m_rcBorderRight.right = rcWindow.right;
 	m_rcBorderRight.bottom = rcWindow.bottom;
 	dc.FillSolidRect(&m_rcBorderRight, RGB(randColorR, randColorG, randColorB));
 	// 绘制顶部
-	m_rcBorderTop.left = rcWindow.left + borderSize;
+	m_rcBorderTop.left = rcWindow.left + m_borderSize;
 	m_rcBorderTop.top = rcWindow.top;
-	m_rcBorderTop.right = rcWindow.right - borderSize;
-	m_rcBorderTop.bottom = borderSize;
+	m_rcBorderTop.right = rcWindow.right - m_borderSize;
+	m_rcBorderTop.bottom = m_borderSize;
 	dc.FillSolidRect(&m_rcBorderTop, RGB(randColorR, randColorG, randColorB));
 	// 绘制底部
-	m_rcBorderBottom.left = rcWindow.left + borderSize;
-	m_rcBorderBottom.top = rcWindow.bottom - borderSize;
-	m_rcBorderBottom.right = rcWindow.right - borderSize;
+	m_rcBorderBottom.left = rcWindow.left + m_borderSize;
+	m_rcBorderBottom.top = rcWindow.bottom - m_borderSize;
+	m_rcBorderBottom.right = rcWindow.right - m_borderSize;
 	m_rcBorderBottom.bottom = rcWindow.bottom;
 	dc.FillSolidRect(&m_rcBorderBottom, RGB(randColorR, randColorG, randColorB));
 }
@@ -163,7 +166,6 @@ void CDropBallDlg::DrawBalls(CPaintDC& dc)
 	RECT rcWindow;
 	GetWindowRect(&rcWindow);
 	
-	int speed = 5;
 	if (m_listBall.GetSize() < m_ballMax)
 	{
 		int centerX = (rcWindow.right - rcWindow.left) / 2; 
@@ -172,14 +174,14 @@ void CDropBallDlg::DrawBalls(CPaintDC& dc)
 		int flagVal = rand() % 2 == 0 ? 1 : -1;
 		int radius = 20 * 30 / m_ballMax + rand() % 5 * flagVal;
 		double PI = 3.1415926;
-		double radian = (360 / m_ballMax * (m_listBall.GetCount() + 1)) * PI / 180;
+		double radian = (360.0 / m_ballMax * (m_listBall.GetCount() + 1)) * PI / 180.0;
 		_stBall stBall;
 		stBall._id = m_listBall.GetSize() + 1;
 		stBall._radius = radius;
 		stBall._x = centerX + 400 * cos(radian);
 		stBall._y = centerY + 400 * sin(radian);
-		stBall._speedX = speed * flagVal;
-		stBall._speedY = speed * flagVal;
+		stBall._speedX = m_speed * flagVal;
+		stBall._speedY = m_speed * flagVal;
 		stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
 		m_listBall.AddTail(stBall);
 	}
@@ -246,25 +248,25 @@ void CDropBallDlg::DrawBalls(CPaintDC& dc)
 			}
 		}
 		// 球与墙壁碰撞判断
-		if (stBall._x - stBall._radius <= rcWindow.left + borderSize)
+		if (stBall._x - stBall._radius <= rcWindow.left + m_borderSize)
 		{
 			stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
-			stBall._speedX = speed;
+			stBall._speedX = m_speed;
 		}
-		else if (stBall._x + stBall._radius >= rcWindow.right - borderSize)
+		else if (stBall._x + stBall._radius >= rcWindow.right - m_borderSize)
 		{
 			stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
-			stBall._speedX = -speed;
+			stBall._speedX = -m_speed;
 		}
-		else if (stBall._y - stBall._radius <= rcWindow.top + borderSize)
+		else if (stBall._y - stBall._radius <= rcWindow.top + m_borderSize)
 		{
 			stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
-			stBall._speedY = speed;
+			stBall._speedY = m_speed;
 		}
-		else if (stBall._y + stBall._radius >= rcWindow.bottom - borderSize)
+		else if (stBall._y + stBall._radius >= rcWindow.bottom - m_borderSize)
 		{
 			stBall._color = RGB(rand() % 256, rand() % 256, rand() % 256);
-			stBall._speedY = -speed;
+			stBall._speedY = -m_speed;
 		}
 		CBrush brush, * oldBrush;
 		CPen oldPen;
