@@ -61,8 +61,7 @@ BOOL CDropBallDlg::OnInitDialog()
 	ShowWindow(ABS_AUTOHIDE | ABS_ALWAYSONTOP);
 	// 隐藏鼠标
 	ShowCursor(FALSE);
-	// 定时刷新
-	SetTimer(1, 40, NULL);
+	
 	srand(time(0)); // 初始化随机数种子
 	CString path;
 	GetModuleFileNameW(NULL,path.GetBufferSetLength(MAX_PATH + 1), MAX_PATH);
@@ -76,6 +75,10 @@ BOOL CDropBallDlg::OnInitDialog()
 	strFile.ReleaseBuffer();
 	m_borderSize = GetPrivateProfileIntW(_T("border"), _T("size"), 30, strFile.GetBuffer());
 	strFile.ReleaseBuffer();
+	m_rate = GetPrivateProfileIntW(_T("app"), _T("rate"), 25, strFile.GetBuffer());
+	strFile.ReleaseBuffer();
+	// 定时刷新
+	SetTimer(1, m_rate, NULL);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }

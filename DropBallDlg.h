@@ -54,6 +54,7 @@ private:
 	int m_ballMax; // 球数量上限
 	int m_borderSize; // 墙壁大小
 	int m_speed; // 球的速度
+	int m_rate; // 刷新间隔
 
 public:
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
